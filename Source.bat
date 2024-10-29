@@ -14,10 +14,11 @@ echo 3. Remove All Windows Animations
 echo 4. Optimize Windows Startup
 echo 5. OPTIMIZE ALL
 echo 6. RESTORE ALL
-echo 7. System Information
-echo 8. Exit
+echo 7. Clear Temporary Files
+echo 8. System Information
+echo 9. Exit
 echo ================================
-set /p choice="Enter your choice (1-8): "
+set /p choice="Enter your choice (1-9): "
 
 if "%choice%"=="1" goto apply_boost
 if "%choice%"=="2" goto apply_low_input_lag
@@ -25,8 +26,9 @@ if "%choice%"=="3" goto remove_animations
 if "%choice%"=="4" goto optimize_startup
 if "%choice%"=="5" goto optimize_all
 if "%choice%"=="6" goto restore_all
-if "%choice%"=="7" goto system_info
-if "%choice%"=="8" exit
+if "%choice%"=="7" goto clear_temp_files
+if "%choice%"=="8" goto system_info
+if "%choice%"=="9" exit
 goto menu
 
 :create_backup
@@ -40,7 +42,7 @@ reg export "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" "%
 reg export "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" "%userprofile%\Desktop\RegistryBackup\GraphicsDrivers.reg" /y
 reg export "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces" "%userprofile%\Desktop\RegistryBackup\TcpipInterfaces.reg" /y
 reg export "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "%userprofile%\Desktop\RegistryBackup\StartupPrograms.reg" /y
-reg export "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "%userprofile%\Desktop\RegistryBackup\StartupProgramsUser.reg" /y
+reg export "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "%userprofile%\Desktop\RegistryBackup\StartupProgramsUser .reg" /y
 exit /b 0
 
 :system_info
@@ -77,7 +79,7 @@ echo ================================
 echo      DETAILED INFORMATION
 echo ================================
 echo.
-systeminfo | findstr /C:"OS Name" /C:"OS Version" /C:"System Manufacturer" /C:"System Model" /C:"BIOS Version" /C:"Total Physical Memory" /C:"Available Physical Memory"
+systeminfo | findstr /C:"OS Name" /C:"OS Version" /C:"System Manufacturer" /C:"System Model" /C:"BIOS Version" /C:"Total Physical Memory" /C:"Available Physical Memory "
 echo.
 echo Current Power Plan:
 powercfg /getactivescheme
@@ -127,8 +129,8 @@ reg add "HKCU\Control Panel\Mouse" /v "MouseThreshold1" /t REG_SZ /d "0" /f
 reg add "HKCU\Control Panel\Mouse" /v "MouseThreshold2" /t REG_SZ /d "0" /f
 
 :: NVIDIA Settings
-reg add "HKLM\SYSTEM\ CurrentControlSet\Control\GraphicsDrivers" /v "RmGpsPsEnablePerCpuCoreDpc" /t REG_DWORD /d "1" /f
-reg add "HKLM\SYSTEM\Current ControlSet\Control\GraphicsDrivers" /v "RmGpsPsEnablePerCpuCoreDpc" /t REG_DWORD /d "1" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "RmGpsPsEnablePerCpuCoreDpc" /t REG_DWORD /d "1" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "RmGpsPsEnablePerCpuCoreDpc" /t REG_DWORD /d "1" /f
 
 :: TCP/IP Settings
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces" /v "TcpAckFrequency" /t REG_DWORD /d "13" /f
@@ -208,5 +210,19 @@ reg import "%userprofile%\Desktop\RegistryBackup\StartupProgramsUser.reg"
 
 echo All settings restored to default successfully!
 echo Please restart your computer for changes to take effect.
+pause
+goto menu
+
+:clear_temp_files
+echo Clearing temporary files...
+
+:: Delete files from temp directories
+del /q /s /f "%temp%\*"
+del /q /s /f "%windir%\temp\*"
+del /q /s /f "%userprofile%\AppData\Local\Temp\*"
+del /q /s /f "%userprofile%\AppData\Local\Microsoft\Windows\Temporary Internet Files\*"
+del /q /s /f "%userprofile%\AppData\Local\Microsoft\Windows\INetCache\*"
+
+echo Temporary files cleared successfully!
 pause
 goto menu
