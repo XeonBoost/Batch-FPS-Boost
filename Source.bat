@@ -1,34 +1,48 @@
 @echo off
 setlocal EnableDelayedExpansion
 color 0A
-title FPS Boost and Low Input Lag Utility
+
+:: Array of titles
+set titles[0]=FPS Boost and Low Input Lag Utility
+set titles[1]=Optimize Your Gaming Experience
+set titles[2]=Enhance Performance and Responsiveness
+set titles[3]=Game Mode and Low Lag Settings
+set titles[4]=Ultimate FPS and Input Lag Tweaker
+
+:: Get a random index
+set /a "randIndex=%RANDOM% %% 5"
+
+:: Set the title to a random selection
+title !titles[%randIndex%]!
 
 :menu
 cls
 echo ================================
-echo  FPS Boost and Low Input Lag Utility
+echo  !titles[%randIndex%]!
 echo ================================
 echo 1. Apply FPS Boost Settings
 echo 2. Apply Low Input Lag Settings
 echo 3. Remove All Windows Animations
 echo 4. Optimize Windows Startup
-echo 5. OPTIMIZE ALL
-echo 6. RESTORE ALL
-echo 7. Clear Temporary Files
-echo 8. System Information
-echo 9. Exit
+echo 5. Clear CPU Processes
+echo 6. Optimize for Low Ping
+echo 7. OPTIMIZE ALL
+echo 8. RESTORE ALL
+echo 9. System Information
+echo 10. Exit
 echo ================================
-set /p choice="Enter your choice (1-9): "
+set /p choice="Enter your choice (1-10): "
 
 if "%choice%"=="1" goto apply_boost
 if "%choice%"=="2" goto apply_low_input_lag
 if "%choice%"=="3" goto remove_animations
 if "%choice%"=="4" goto optimize_startup
-if "%choice%"=="5" goto optimize_all
-if "%choice%"=="6" goto restore_all
-if "%choice%"=="7" goto clear_temp_files
-if "%choice%"=="8" goto system_info
-if "%choice%"=="9" exit
+if "%choice%"=="5" goto clear_cpu_processes
+if "%choice%"=="6" goto optimize_low_ping
+if "%choice%"=="7" goto optimize_all
+if "%choice%"=="8" goto restore_all
+if "%choice%"=="9" goto system_info
+if "%choice%"=="10" exit
 goto menu
 
 :create_backup
@@ -67,7 +81,7 @@ set /a ramGB=%ram:~0,-1%/1024/1024/1024
 echo Total RAM: %ramGB% GB
 echo.
 echo GPU Information:
-wmic path win32_VideoController get Name,AdapterRAM,DriverVersion /value | find "="
+wmic path win32_V ideoController get Name,AdapterRAM,DriverVersion /value | find "="
 echo.
 echo Storage Information:
 wmic diskdrive get Model,Size,Status /value | find "="
@@ -79,7 +93,7 @@ echo ================================
 echo      DETAILED INFORMATION
 echo ================================
 echo.
-systeminfo | findstr /C:"OS Name" /C:"OS Version" /C:"System Manufacturer" /C:"System Model" /C:"BIOS Version" /C:"Total Physical Memory" /C:"Available Physical Memory "
+systeminfo | findstr /C:"OS Name" /C:"OS Version" /C:"System Manufacturer" /C:"System Model" /C:"BIOS Version" /C:"Total Physical Memory" /C:"Available Physical Memory"
 echo.
 echo Current Power Plan:
 powercfg /getactivescheme
@@ -133,8 +147,8 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "RmGpsPsEnabl
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "RmGpsPsEnablePerCpuCoreDpc" /t REG_DWORD /d "1" /f
 
 :: TCP/IP Settings
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces" /v "TcpAckFrequency" /t REG_DWORD /d "13" /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces" /v "TcpNoDelay" /t REG_DWORD /d "1" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces" /v "TcpAck Frequency" /t REG_DWORD /d "13" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces" /v "TcpNoDelay " /t REG_DWORD /d "1" /f
 
 echo Low input lag settings applied successfully!
 echo Please restart your computer for changes to take effect.
@@ -146,7 +160,7 @@ call :create_backup
 echo Removing all Windows animations...
 
 :: Disable Animations
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d "2" /f
+reg add "HK CU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d "2" /f
 
 echo Animations removed successfully!
 echo Please restart your computer for changes to take effect.
@@ -172,6 +186,43 @@ echo Please restart your computer for changes to take effect.
 pause
 goto menu
 
+:clear_cpu_processes
+cls
+echo Clearing CPU Processes...
+echo.
+echo Closing unnecessary background applications...
+echo.
+
+:: List of processes to terminate
+set processes=chrome.exe firefox.exe spotify.exe discord.exe steam.exe
+
+:: Terminate each process
+for %%p in (%processes%) do (
+    taskkill /im %%p /f > nul 2>&1
+)
+
+echo CPU processes cleared successfully!
+echo Please restart your computer for changes to take effect.
+pause
+goto menu
+
+:optimize_low_ping
+cls
+echo Optimizing for Low Ping...
+echo.
+echo Disabling Windows Auto-Tuning...
+netsh int tcp set heuristics disabled
+echo Disabling Background Services...
+net stop "Background Intelligent Transfer Service"
+net stop "Windows Update"
+echo Adjusting TCP/IP settings...
+netsh int tcp set global autotuninglevel=disabled
+netsh int tcp set global rss=enabled
+echo Low ping optimization complete!
+echo Please restart your computer for changes to take effect.
+pause
+goto menu
+
 :optimize_all
 call :create_backup
 echo Optimizing all settings...
@@ -188,6 +239,9 @@ call :remove_animations
 :: Optimize Windows Startup
 call :optimize_startup
 
+:: Optimize for Low Ping
+call :optimize_low_ping
+
 echo All optimizations applied successfully!
 echo Please restart your computer for changes to take effect.
 pause
@@ -197,7 +251,7 @@ goto menu
 echo Restoring all settings to default...
 
 :: Restore Registry Backups
-reg import "%userprofile%\Desktop\RegistryBackup\SystemProfile.reg"
+reg import "%userprofile%\Desktop\RegistryBackup \SystemProfile.reg"
 reg import "%userprofile%\Desktop\RegistryBackup\Games.reg"
 reg import "%userprofile%\Desktop\RegistryBackup\VisualEffects.reg"
 reg import "%userprofile%\Desktop\RegistryBackup\Mouse.reg"
@@ -206,23 +260,9 @@ reg import "%userprofile%\Desktop\RegistryBackup\ExplorerAdvanced.reg"
 reg import "%userprofile%\Desktop\RegistryBackup\GraphicsDrivers.reg"
 reg import "%userprofile%\Desktop\RegistryBackup\TcpipInterfaces.reg"
 reg import "%userprofile%\Desktop\RegistryBackup\StartupPrograms.reg"
-reg import "%userprofile%\Desktop\RegistryBackup\StartupProgramsUser.reg"
+reg import "%userprofile%\Desktop\RegistryBackup\StartupProgramsUser  .reg"
 
 echo All settings restored to default successfully!
 echo Please restart your computer for changes to take effect.
-pause
-goto menu
-
-:clear_temp_files
-echo Clearing temporary files...
-
-:: Delete files from temp directories
-del /q /s /f "%temp%\*"
-del /q /s /f "%windir%\temp\*"
-del /q /s /f "%userprofile%\AppData\Local\Temp\*"
-del /q /s /f "%userprofile%\AppData\Local\Microsoft\Windows\Temporary Internet Files\*"
-del /q /s /f "%userprofile%\AppData\Local\Microsoft\Windows\INetCache\*"
-
-echo Temporary files cleared successfully!
 pause
 goto menu
