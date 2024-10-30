@@ -21,7 +21,7 @@ This batch script is designed to optimize your Windows gaming experience by appl
 1. **Download the Script**: Clone or download this repository to your local machine.
 
 2. **Run as Administrator**:
-   - Right-click on the script file (e.g., `optimize_gaming.bat`).
+   - Right-click on the script file (e.g., `Source.bat`).
    - Select "Run as administrator" to ensure the script has the necessary permissions to make system changes.
 
 3. **Follow the On-Screen Menu**:
